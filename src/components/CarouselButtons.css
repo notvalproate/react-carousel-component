@@ -22,11 +22,6 @@
     margin-right: 20%;
 }
 
-.carousel-button:active {
-    opacity: 60%;
-    transition: 0ms;
-}
-
 .prev {
     left: 0;
 }
