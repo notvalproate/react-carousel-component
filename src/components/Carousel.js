@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import "./CarouselButtons.css"
 
 function Carousel(props) {
+  const length = props.items.length;
+  const actualLength = props.items.length + 2;
+
   const [activeIndex, setActiveIndex] = useState(0);
-  const [translateValue, setTranslateValue] = useState(-(100 / 3));
-  const [Items, setItems] = useState([props.items[props.items.length - 1], props.items[0], props.items[1]]);
+  const [translateValue, setTranslateValue] = useState(-(100 / (actualLength)));
+
+  const Items = [props.items[length - 1], ...props.items, props.items[0]];  
 
   const carouselStyle = {
+    // overflow: "hidden",
+    margin: props.margin,
     position: "relative",
-    height: `${props.height}px`,
-    width: `${props.width}px`
+    height: props.height,
+    maxHeight: props.maxHeight,
+    width: props.width,
+    maxWidth: props.maxWidth,
+    borderRadius: props.borderRadius
   }
 
   const wrapperStyle = {
     display: "flex",
-    width: `${props.width * 3}px`,
+    width: `${parseInt(props.width) * (length + 2)}${props.width.replace(/\d+/, '')}`,
     height: "100%",
     transform: `translateX(${translateValue}%)` 
   }
@@ -23,43 +33,29 @@ function Carousel(props) {
     display: "inline-flex",
     overflow: "hidden",
     justifyContent: "center",
-    height: `${props.height}px`,
-    width: `${props.width}px`
-  }
-
-  const getList = (i) => {
-    let middle = i < 0 ? props.items.length - 1 : i % props.items.length;
-    let first = (middle - 1) < 0 ? props.items.length - 1 : middle - 1;
-    let last = (i + 1) % props.items.length;
-  
-    const array = [
-      props.items[first],
-      props.items[middle],
-      props.items[last]
-    ];
-    
-    return array;
+    height: "100%",
+    width: "100%"
   }
 
   const nextItem = () => {
-    setItems(getList(activeIndex + 1));
-
-    if (activeIndex === (props.items.length - 1)) {
+    if (activeIndex === (length - 1)) {
       setActiveIndex(0);
+      setTranslateValue(-(100 / actualLength));
     } 
     else {
       setActiveIndex(activeIndex + 1);
+      setTranslateValue(translateValue - (100 / actualLength));
     }
   }
 
   const prevItem = () => {
-    setItems(getList(activeIndex - 1));
-
     if (activeIndex === 0) {
-      setActiveIndex(props.items.length - 1);
+      setActiveIndex(length - 1);
+      setTranslateValue(-((100 * length)/ actualLength));
     } 
     else {
       setActiveIndex(activeIndex - 1);
+      setTranslateValue(translateValue + (100 / actualLength));
     }
   }
 
@@ -78,6 +74,32 @@ function Carousel(props) {
       <button className="carousel-button next" onClick={nextItem}><i className="arrow right"/></button>
     </div>
   );
+}
+
+Carousel.propTypes = {
+  margin: PropTypes.string,
+  width: PropTypes.string,
+  maxWidth: PropTypes.string,
+  height: PropTypes.string,
+  maxHeight: PropTypes.string,
+  borderRadius: PropTypes.string,
+  items: PropTypes.arrayOf(PropTypes.element)
+}
+
+Carousel.defaultProps = {
+  margin: "20px",
+  width: "30vw",
+  maxWidth: "1280px",
+  height: "35vh",
+  maxHeight: "720px",
+  borderRadius: "0px",
+  items: [
+    <img src="./test.png" alt="img1" loading="lazy"/>,
+    <img src="https://source.unsplash.com/category/nature" alt="img2" loading="lazy"/>,
+    <img src="https://source.unsplash.com/category/fashion" alt="img3" loading="lazy"/>,
+    <img src="https://source.unsplash.com/category/animals" alt="img4" loading="lazy"/>,
+    <img src="https://source.unsplash.com/category/kanva" alt="img5" loading="lazy"/>
+  ]
 }
 
 export default Carousel;
