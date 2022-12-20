@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef} from 'react';
 import PropTypes from 'prop-types';
 import "./CarouselButtons.css"
 
@@ -8,6 +8,8 @@ function Carousel(props) {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [translateValue, setTranslateValue] = useState(-(100 / (actualLength)));
+
+  const wrapperRef = useRef();
 
   const Items = [props.items[length - 1], ...props.items, props.items[0]];  
 
@@ -36,14 +38,20 @@ function Carousel(props) {
     height: "100%",
     width: "100%"
   }
-
+  
   const nextItem = () => {
     if (activeIndex === (length - 1)) {
       setActiveIndex(0);
-      setTranslateValue(-(100 / actualLength));
+      wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
+      setTranslateValue(translateValue - (100 / actualLength));
+      setTimeout(() => {
+        wrapperRef.current.style.transition = "none";
+        setTranslateValue(-((100)/ actualLength));
+      }, props.transitionLength);
     } 
     else {
       setActiveIndex(activeIndex + 1);
+      wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
       setTranslateValue(translateValue - (100 / actualLength));
     }
   }
@@ -51,17 +59,23 @@ function Carousel(props) {
   const prevItem = () => {
     if (activeIndex === 0) {
       setActiveIndex(length - 1);
-      setTranslateValue(-((100 * length)/ actualLength));
+      wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
+      setTranslateValue(translateValue + (100 / actualLength));
+      setTimeout(() => {
+        wrapperRef.current.style.transition = "none";
+        setTranslateValue(-((100 * length)/ actualLength));
+      }, props.transitionLength);
     } 
     else {
       setActiveIndex(activeIndex - 1);
+      wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
       setTranslateValue(translateValue + (100 / actualLength));
     }
   }
 
   return (
     <div className="carousel" style={carouselStyle}>
-      <div className="carousel-wrapper" style={wrapperStyle}>
+      <div className="carousel-wrapper" ref={wrapperRef} style={wrapperStyle}>
         {Items.map((item, index) => {
           return (
             <div key={index} style={itemStyle}>
@@ -83,6 +97,7 @@ Carousel.propTypes = {
   height: PropTypes.string,
   maxHeight: PropTypes.string,
   borderRadius: PropTypes.string,
+  transitionLength: PropTypes.number,
   items: PropTypes.arrayOf(PropTypes.element)
 }
 
@@ -93,6 +108,7 @@ Carousel.defaultProps = {
   height: "35vh",
   maxHeight: "720px",
   borderRadius: "0px",
+  transitionLength: 250,
   items: [
     <img src="./test.png" alt="img1" loading="lazy"/>,
     <img src="https://source.unsplash.com/category/nature" alt="img2" loading="lazy"/>,
