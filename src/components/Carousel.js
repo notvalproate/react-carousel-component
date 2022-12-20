@@ -8,48 +8,44 @@ function Carousel(props) {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [translateValue, setTranslateValue] = useState(-(100 / (actualLength)));
+  const [indicators, setIndicators] = useState(props.items.map((item, index) => { 
+    if(index === 0){
+      return (
+        <li key={index} className="dot dot-active" onClick={() => goToItem(index)}/>
+      )
+    }
+    return (
+      <li key={index} className="dot" onClick={() => goToItem(index)}/>
+    )
+  }))
 
   const wrapperRef = useRef();
 
-  const Items = [props.items[length - 1], ...props.items, props.items[0]];
-
-  const buttonStyle = {
-    width: `${parseInt(props.width) * 0.08}${props.width.replace(/\d+/, '')}`
-  }
+  const items = [props.items[length - 1], ...props.items, props.items[0]];
 
   const carouselStyle = {
     margin: props.margin,
-    position: "relative",
     height: props.height,
     maxHeight: props.maxHeight,
-    width: `${parseInt(props.width) * 1.16}${props.width.replace(/\d+/, '')}`,
-    maxWidth: `${parseInt(props.maxWidth) * 1.16}${props.width.replace(/\d+/, '')}`,
-    borderRadius: props.borderRadius
+    width: `${parseInt(props.width) * (((props.buttonWidth * 2) + 100)/ 100)}${props.width.replace(/\d+/, '')}`,
+    maxWidth: `${parseInt(props.maxWidth) * (((props.buttonWidth * 2) + 100)/ 100)}${props.maxWidth.replace(/\d+/, '')}`,
+    borderRadius: props.borderRadius,
+    backgroundColor: props.bgColor
   }
   
   const windowStyle = {
     overflow: "hidden",
-    position: "relative",
-    left: `${parseInt(props.width) * 0.08}${props.width.replace(/\d+/, '')}`,
+    order: "2",
     height: props.height,
     maxHeight: props.maxHeight,
     width: props.width,
+    maxWidth: props.maxWidth,
     borderRadius: props.borderRadius
   }
 
   const wrapperStyle = {
-    display: "flex",
     width: `${parseInt(props.width) * (length + 2)}${props.width.replace(/\d+/, '')}`,
-    height: "100%",
     transform: `translateX(${translateValue}%)`
-  }
-
-  const itemStyle = {
-    display: "inline-flex",
-    overflow: "hidden",
-    justifyContent: "center",
-    height: "100%",
-    width: "100%"
   }
 
   const nextItem = () => {
@@ -58,6 +54,7 @@ function Carousel(props) {
 
     if (activeIndex === (length - 1)) {
       setActiveIndex(0);
+      updateIndicators(0);
       setTimeout(() => {
         wrapperRef.current.style.transition = "none";
         setTranslateValue(-((100) / actualLength));
@@ -65,6 +62,7 @@ function Carousel(props) {
     }
     else {
       setActiveIndex(activeIndex + 1);
+      updateIndicators(activeIndex + 1);
     }
   }
 
@@ -74,6 +72,7 @@ function Carousel(props) {
 
     if (activeIndex === 0) {
       setActiveIndex(length - 1);
+      updateIndicators(length - 1);
       setTimeout(() => {
         wrapperRef.current.style.transition = "none";
         setTranslateValue(-((100 * length) / actualLength));
@@ -81,24 +80,51 @@ function Carousel(props) {
     }
     else {
       setActiveIndex(activeIndex - 1);
+      updateIndicators(activeIndex - 1);
     }
   }
 
+  const goToItem = (i) => {
+    console.log(i);
+    wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
+    setActiveIndex(i);
+    setTranslateValue(- (100 * (i + 1) / actualLength));
+    updateIndicators(i);
+  }
+
+  const updateIndicators = (i) => {
+    setIndicators((props.items.map((item, index) => { 
+      if(index === i){
+        return (
+          <li key={index} className="dot dot-active" onClick={() => goToItem(index)}/>
+        )
+      }
+      return (
+        <li key={index} className="dot" onClick={() => goToItem(index)}/>
+      )
+    })))
+  }
+
   return (
-    <div className="carousel" style={carouselStyle}>
-      <div className="carousel-window" style={windowStyle}>
-        <div className="carousel-wrapper" ref={wrapperRef} style={wrapperStyle}>
-          {Items.map((item, index) => {
-            return (
-              <div key={index} style={itemStyle}>
-                {item}
-              </div>
-            )
-          })}
+    <div className="carousel-container">
+      <div className="carousel-main" style={carouselStyle}>
+        <div className="carousel-window" style={windowStyle}>
+          <div className="carousel-wrapper" ref={wrapperRef} style={wrapperStyle}>
+            {items.map((item, index) => {
+              return (
+                <div key={index} className="item-style">
+                  {item}
+                </div>
+              )
+            })}
+          </div>
         </div>
+        <button className="carousel-button prev" onClick={prevItem}><i className="arrow left" style={{ borderColor: props.arrowColor }} /></button>
+        <button className="carousel-button next" onClick={nextItem}><i className="arrow right" style={{ borderColor: props.arrowColor }} /></button>
       </div>
-      <button className="carousel-button prev" onClick={prevItem} style={buttonStyle}><i className="arrow left" /></button>
-      <button className="carousel-button next" onClick={nextItem} style={buttonStyle}><i className="arrow right" /></button>
+      <ul className="indicator-style">
+        {indicators}
+      </ul>
     </div>
   );
 }
@@ -111,6 +137,9 @@ Carousel.propTypes = {
   maxHeight: PropTypes.string,
   borderRadius: PropTypes.string,
   transitionLength: PropTypes.number,
+  arrowColor: PropTypes.string,
+  buttonWidth: PropTypes.number,
+  bgColor: PropTypes.string,
   items: PropTypes.arrayOf(PropTypes.element)
 }
 
@@ -122,6 +151,9 @@ Carousel.defaultProps = {
   maxHeight: "100vh",
   borderRadius: "0px",
   transitionLength: 250,
+  arrowColor: "rgb(189, 189, 189)",
+  buttonWidth: 8,
+  bgColor: "rgb(255, 255, 255, 0)",
   items: [
     <img src="./test.png" alt="img1" loading="lazy" />,
     <img src="https://source.unsplash.com/category/nature" alt="img2" loading="lazy" />,

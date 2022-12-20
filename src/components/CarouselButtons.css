@@ -1,10 +1,28 @@
-.carousel-button {
-    background-color: rgba(255, 255, 255, 0);
-    position: absolute;
+.carousel-main {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.carousel-wrapper {
+    display: flex;
     height: 100%;
-    opacity: 70%;
-    width: 8%;
-    top: 0;
+}
+
+.item-style {
+    display: inline-flex;
+    overflow: hidden;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-button {
+    cursor: pointer;
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0);
+    height: 100%;
+    opacity: 50%;
     border: none;
     transition: 400ms;
 }
@@ -15,27 +33,29 @@
 }
 
 .carousel-button:hover .right {
-    margin-left: 20%;
+    margin-left: 30%;
 }
 
 .carousel-button:hover .left {
-    margin-right: 20%;
+    margin-right: 30%;
 }
 
 .prev {
+    order: 1;
     left: 0;
 }
 
 .next {
+    order: 3;
     right: 0;
 }
 
 .arrow {
     aspect-ratio: 1 / 1;
-    width: 13%;
+    width: 20%;
     border: solid rgb(189, 189, 189);
-    border-width: 0 4px 4px 0;
-    border-radius: 3px;
+    border-width: 0 7px 7px 0;
+    border-radius: 4px;
     display: inline-block;
     padding: 3px;
     transition: 150ms;
@@ -49,4 +69,32 @@
 .left {
     transform: rotate(135deg);
     -webkit-transform: rotate(135deg);
+}
+
+.indicator-style {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    list-style-type: none;
+    margin: 0;
+}
+
+.dot {
+    cursor: pointer;
+    margin: 20px 10px;
+    height: 12px;
+    width: 12px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    transition: 200ms;
+}
+
+.dot:hover {
+    transform: scale(125%);
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dot-active {
+    transform: scale(150%);
+    background-color: white;
 }
