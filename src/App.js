@@ -1,9 +1,10 @@
 import Carousel from './components/Carousel';
 
 function App() {
-
   return (
-    <Carousel width="1280px" height="720px" margin="0px 800px"/>
+    <div style={{display: "flex", width: "100vw", height: "100vh", justifyContent: "center", alignItems: "center"}}>
+      <Carousel width="50vw" height="50vh" margin="0px"/>
+    </div>
   );
 }
 
