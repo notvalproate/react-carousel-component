@@ -17,7 +17,7 @@ function Carousel(props) {
   }
   
   const windowStyle = {
-    overflow: "hidden",
+    // overflow: "hidden",
     order: "2",
     height: props.height,
     maxHeight: props.maxHeight,
@@ -37,7 +37,10 @@ function Carousel(props) {
   }
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [pointerIsDown, setPointerIsDown] = useState(false);
+  const [beginTranslate, setBeginTranslate] = useState(-(100 / (actualLength)));
   const [translateValue, setTranslateValue] = useState(-(100 / (actualLength)));
+  const [startPos, setStartPos] = useState(0);
   const [indicators, setIndicators] = useState(props.items.map((item, index) => { 
     if(index === 0){
       return (
@@ -68,7 +71,8 @@ function Carousel(props) {
 
   const switchItem = (i, currentPos, nextPos) => {
     wrapperRef.current.style.transition = `transform ${props.transitionLength}ms cubic-bezier(.15,.52,.29,.97)`;
-    setTranslateValue(translateValue + (i * (100 / actualLength)));
+    setTranslateValue(beginTranslate + (i * (100 / actualLength)));
+    setBeginTranslate(beginTranslate + (i * (100 / actualLength)));
 
     if (activeIndex === (currentPos)) {
       setActiveIndex(nextPos);
@@ -76,6 +80,7 @@ function Carousel(props) {
       setTimeout(() => {
         wrapperRef.current.style.transition = "none";
         setTranslateValue(-((100 * (nextPos + 1)) / actualLength));
+        setBeginTranslate(-((100 * (nextPos + 1)) / actualLength));
       }, props.transitionLength);
     }
     else {
@@ -104,6 +109,40 @@ function Carousel(props) {
     })))
   }
 
+  const pointerDown = (event) => { 
+      setStartPos(event.pageX);
+      setBeginTranslate(translateValue);
+      setPointerIsDown(true);
+  }
+
+  const pointerMove = (event) => {
+    if(pointerIsDown || event.type === "touchmove"){
+      wrapperRef.current.style.cursor = 'grabbing';
+      console.log(event.pageX - startPos);
+      setTranslateValue(beginTranslate + ((event.pageX - startPos) / (20 * actualLength)));
+    }
+  }
+
+  const pointerUp = (event) => {
+    setPointerIsDown(false);
+    const direction = ((event.pageX - startPos) / (length));
+    if(direction < actualLength){
+      nextItem();
+    }
+    else if(direction > actualLength){
+      prevItem();
+    }
+    else{
+      goToItem(activeIndex);
+    }
+    wrapperRef.current.style.cursor = 'default';
+  }
+
+  const pointerLeave = () => {
+    goToItem(activeIndex);
+    setPointerIsDown(false);
+  }
+
   return (
     <div className="carousel-container">
       <div className="carousel-main" style={carouselStyle}>
@@ -111,7 +150,7 @@ function Carousel(props) {
           <div className="carousel-wrapper" ref={wrapperRef} style={wrapperStyle}>
             {items.map((item, index) => {
               return (
-                <div key={index} className="item-style">
+                <div key={index} className="item-style" onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerLeave={pointerLeave}>
                   {item}
                 </div>
               )
@@ -160,11 +199,11 @@ Carousel.defaultProps = {
   dotWidth: "1.2%",
   dotRadius: "100%",
   items: [
-    <img src="./test.png" alt="img1" loading="lazy" />,
-    <img src="https://source.unsplash.com/category/nature" alt="img2" loading="lazy" />,
-    <img src="https://source.unsplash.com/category/fashion" alt="img3" loading="lazy" />,
-    <img src="https://source.unsplash.com/category/animals" alt="img4" loading="lazy" />,
-    <img src="https://source.unsplash.com/category/kanva" alt="img5" loading="lazy" />
+    <img src="./test.png" alt="img1" loading="lazy" draggable="false"/>,
+    <img src="https://source.unsplash.com/category/nature" alt="img2" loading="lazy" draggable="false"/>,
+    <img src="https://source.unsplash.com/category/fashion" alt="img3" loading="lazy" draggable="false"/>,
+    <img src="https://source.unsplash.com/category/animals" alt="img4" loading="lazy" draggable="false"/>,
+    <img src="https://source.unsplash.com/category/kanva" alt="img5" loading="lazy" draggable="false"/>
   ]
 }
 

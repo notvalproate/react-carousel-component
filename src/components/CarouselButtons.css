@@ -1,4 +1,5 @@
 .carousel-main {
+    user-select: none;
     position: relative;
     display: flex;
     justify-content: center;
